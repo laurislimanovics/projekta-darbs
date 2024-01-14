@@ -37,6 +37,31 @@ def count_officials(dataframe, column_name='Amatpersona'):
     for value, count in counts.items():
         status = 'amatpersonas' if value else 'nav amatpersonas'
         print(f"{count} darbinieki ir {status}.")
+# Funkcija, kas aprēķina darbinieku skaitu katrā nodaļā
+def count_employees_per_division(divisions, dataframe):
+    employee_counts = {}
+    for division in divisions:
+        # Tiek izmantota funkcija str.contains, lai atrastu rindas, kurās ir minēta nodaļa
+        division_df = dataframe[dataframe['Pilns nosaukums'].str.contains(division, na=False, regex=False)]
+        # Skaita rindas, kas atbilst nodaļai
+        employee_count = len(division_df)
+        employee_counts[division] = employee_count
+    return employee_counts
+
+# Funkcija, kas aprēķina darbinieku skaitu katrā nodaļā
+def count_employees_per_division(divisions, dataframe):
+    employee_counts = {}
+    for division in divisions:
+        # Tiek izmantota funkcija str.contains, lai atrastu rindas, kurās ir minēta nodaļa
+        division_df = dataframe[dataframe['Pilns nosaukums'].str.contains(division, na=False, regex=False)]
+        # Skaita rindas, kas atbilst nodaļai
+        employee_count = len(division_df)
+        employee_counts[division] = employee_count
+    return employee_counts
+
+# Aprēķina darbinieku skaitu katrā nodaļā
+division_employee_counts = count_employees_per_division(division_list, df)
+
 # Aprēķina vidējo algu nodaļām
 division_salary_averages = average_salary(division_list, df)
 
@@ -53,3 +78,6 @@ for division, average_time in division_averages.items():
 print("---------------------------------------------")
 for division, average_salary in division_salary_averages.items():
     print(f"{division} - vidējā alga: {average_salary:.2f} EUR")
+print("---------------------------------------------")
+for division, employee_count in division_employee_counts.items():
+    print(f"{division} - darbinieku skaits: {employee_count}")
