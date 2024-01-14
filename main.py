@@ -6,6 +6,8 @@ from funkcijas.avg_salary import average_salary
 from funkcijas.count_officials import count_officials
 from funkcijas.count_employees import count_employees_per_division
 from funkcijas.count_by_address import count_employees_by_address
+from funkcijas.check_vacation import check_if_on_vacation
+from funkcijas.check_replace import check_if_being_replaced
 
 # Ielādē datus no Excel faila
 df = pd.read_excel('empl.xlsx')
@@ -31,6 +33,11 @@ officials_counts = count_officials(df)
 # Aprēķina darbinieku skaitu pēc adreses
 address_counts = count_employees_by_address(df)
 
+# Pārbauda, cik darbinieki ir atvaļinājumā
+is_on_vacation = check_if_on_vacation(df)
+
+# Pārbauda, cik darbinieki tiek aizvietoti
+is_being_replaced = check_if_being_replaced(df)
 # Izvada rezultātus
 print("---------------------------------------------")
 for division, average_time in division_averages.items():
@@ -47,3 +54,6 @@ print(f"{officials_counts['nav amatpersonas']} darbinieki nav amatpersonas.")
 print("---------------------------------------------")
 for address, count in address_counts.items():
     print(f"Adresē '{address}' strādā {count} darbinieki.")
+print("---------------------------------------------")
+print(f"{is_on_vacation.sum()} darbinieki ir atvaļinājumā.")
+print(f"{is_being_replaced.sum()} darbinieki tiek aizvietoti.")
