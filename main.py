@@ -8,6 +8,7 @@ from funkcijas.count_employees import count_employees_per_division
 from funkcijas.count_by_address import count_employees_by_address
 from funkcijas.check_vacation import check_if_on_vacation
 from funkcijas.check_replace import check_if_being_replaced
+from funkcijas.empl_workload import count_employees_by_workload
 
 # Ielādē datus no Excel faila
 df = pd.read_excel('empl.xlsx')
@@ -38,6 +39,10 @@ is_on_vacation = check_if_on_vacation(df)
 
 # Pārbauda, cik darbinieki tiek aizvietoti
 is_being_replaced = check_if_being_replaced(df)
+
+# Cik darbinieku ir katrā slodzē
+workload_counts = count_employees_by_workload(df)
+
 # Izvada rezultātus
 print("---------------------------------------------")
 for division, average_time in division_averages.items():
@@ -57,3 +62,6 @@ for address, count in address_counts.items():
 print("---------------------------------------------")
 print(f"{is_on_vacation.sum()} darbinieki ir atvaļinājumā.")
 print(f"{is_being_replaced.sum()} darbinieki tiek aizvietoti.")
+print("---------------------------------------------")
+for workload, count in workload_counts.items():
+    print(f"Slodze {workload} - {count} darbinieki")
