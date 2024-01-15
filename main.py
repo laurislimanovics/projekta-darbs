@@ -10,9 +10,11 @@ from funkcijas.check_vacation import check_if_on_vacation
 from funkcijas.check_replace import check_if_being_replaced
 from funkcijas.empl_workload import count_employees_by_workload
 from funkcijas.empl_eval import count_employee_evaluation
+from funkcijas.empl_education import count_education_levels
 
 # Ielādē datus no Excel faila
 df = pd.read_excel('empl.xlsx')
+education_file_path = 'education.xlsx'
 
 # Nodaļu saraksts
 division_list = ['Jelgavas reģionālā nodaļa', 'Daugavpils reģionālā nodaļa', 'Valmieras reģionālā nodaļa', 'Ventspils reģionālā nodaļa', 'Liepājas reģionālā nodaļa', 
@@ -47,6 +49,9 @@ workload_counts = count_employees_by_workload(df)
 # Cik darbinieku ir katrā vērtējumā
 evaluation_counts = count_employee_evaluation(df)
 
+# Cik darbinieku ir katrā izglītības līmenī
+education_counts = count_education_levels(education_file_path)
+
 # Izvada rezultātus
 print("---------------------------------------------")
 for division, average_time in division_averages.items():
@@ -72,3 +77,7 @@ for workload, count in workload_counts.items():
 print("---------------------------------------------")
 for evaluation, count in evaluation_counts.items():
     print(f"Vērtējums {evaluation} - {count} darbinieki")
+print("---------------------------------------------")
+print("Izglītības līmeņi:")
+for education, count in education_counts.items():
+    print(f"{education} - {count} darbinieki")
