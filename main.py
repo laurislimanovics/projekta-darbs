@@ -11,6 +11,7 @@ from funkcijas.check_replace import check_if_being_replaced
 from funkcijas.empl_workload import count_employees_by_workload
 from funkcijas.empl_eval import count_employee_evaluation
 from funkcijas.empl_education import count_education_levels
+from funkcijas.avg_evaluation_per_division import avg_evaluation_per_division
 
 # Ielādē datus no Excel faila
 df = pd.read_excel('empl.xlsx')
@@ -52,6 +53,9 @@ evaluation_counts = count_employee_evaluation(df)
 # Cik darbinieku ir katrā izglītības līmenī
 education_counts = count_education_levels(education_file_path)
 
+# Vidējais vērtējums katrā nodaļā
+division_avg_evaluations = avg_evaluation_per_division(df, division_list)
+
 # Izvada rezultātus
 print("---------------------------------------------")
 for division, average_time in division_averages.items():
@@ -81,3 +85,10 @@ print("---------------------------------------------")
 print("Izglītības līmeņi:")
 for education, count in education_counts.items():
     print(f"{education} - {count} darbinieki")
+print("---------------------------------------------")
+print("Vidējais novērtējums katrā nodaļā:")
+for division, avg_evaluation in division_avg_evaluations.items():
+    if pd.isna(avg_evaluation):
+        print(f"{division}: Nav pietiekami datu")
+    else:
+        print(f"{division}: {avg_evaluation:.2f}")
