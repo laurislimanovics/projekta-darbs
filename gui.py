@@ -8,6 +8,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 # Funkcijas importēšana no funkciju failiem
 from funkcijas.avg_salary import average_salary
 from funkcijas.count_employees import count_employees_per_division
+from funkcijas.count_by_address import count_employees_by_address
+
 # Ielādē datus no Excel faila
 df = pd.read_excel('empl.xlsx')
 education_file_path = 'education.xlsx'
@@ -31,11 +33,20 @@ def generate_pie_chart():
     elif report_type == 'Darbinieku skaits nodaļās':
         result = count_employees_per_division(division_list, df)
 
-        # Ģenerē tortes diagrammu, pamatojoties uz rezultātu ar vidējo algu
+        # Ģenerē tortes diagrammu, pamatojoties uz rezultātu ar darbinieku skaitu nodaļās
         plt.figure(figsize=(8, 8)) 
         plt.pie(result.values(), labels=result.keys(), autopct=lambda p: f'{int(p * sum(result.values()) / 100)}', textprops={'fontsize': 10})
         plt.title("Darbinieku skaits nodaļās")
         plt.show()
+    elif report_type == 'Darbinieku skaits pēc adreses':
+        result = count_employees_by_address(df)
+
+        # Ģenerē tortes diagrammu, pamatojoties uz rezultātu ar darbinieku skaitu pēc adreses
+        plt.figure(figsize=(8, 8)) 
+        plt.pie(result.values(), labels=result.keys(), autopct=lambda p: f'{int(p * sum(result.values()) / 100)}', textprops={'fontsize': 10})
+        plt.title("Darbinieku skaits pēc adreses")
+        plt.show()
+
 # Funkcija tabulas ziņojuma ģenerēšanai
 def generate_table_report():
     # Saņem izvēlēto ziņojuma veidu no nolaižamā saraksta
@@ -74,6 +85,7 @@ def generate_table_report():
         # Konfigurējiet režģus
         table_window.grid_rowconfigure(0, weight=1)
         table_window.grid_columnconfigure(0, weight=1)
+        
     elif report_type == 'Darbinieku skaits nodaļās': 
         employee_counts = count_employees_per_division(division_list, df)
 
@@ -108,6 +120,46 @@ def generate_table_report():
         # Konfigurējiet režģus
         table_window.grid_rowconfigure(0, weight=1)
         table_window.grid_columnconfigure(0, weight=1)
+
+    elif report_type == 'Darbinieku skaits pēc adreses':
+        employee_counts = count_employees_by_address(df)
+
+        addresses = list(employee_counts.keys()) # Pārvērst vārdnīcas atslēgas sarakstu
+        employee_counts_values = list(employee_counts.values()) # Pārvērst vārdnīcas vērtību sarakstu
+
+        # Izveido jaunu logu tabulas rādīšanai
+        table_window = tk.Toplevel(root)
+        table_window.title('Tabulas ziņojums')
+
+        # Izveido Treeview logrīka izveidošanai
+        tree = ttk.Treeview(table_window, columns=("Adrese", "Darbinieku skaits"), show="headings")
+        tree.heading("Adrese", text="Adrese", anchor="center")  
+        tree.heading("Darbinieku skaits", text="Darbinieku skaits", anchor="center")  
+        tree.column("Adrese", width=300)  
+        tree.column("Darbinieku skaits", width=150)
+
+        # Izveido vertikālu ritjoslu
+        tree_scrollbar = ttk.Scrollbar(table_window, orient="vertical", command=tree.yview)
+        tree.configure(yscroll=tree_scrollbar.set)
+
+        # Iepakojiet Treeview un ritjoslu
+        tree.grid(row=0, column=0, sticky="nsew")
+        tree_scrollbar.grid(row=0, column=1, sticky="ns")
+
+        # Ievietojiet datus Treeview logrīkā ar centrētu izlīdzinājumu
+        for address, employee_count in zip(addresses, employee_counts_values):
+            tree.insert("", "end", values=(address, f"{employee_count}"))
+
+        # Pievieno režģus Treeview
+        style = ttk.Style()
+        style.configure("Treeview", rowheight=25, font=('Helvetica', 10))
+        tree.tag_configure("centered", anchor="center")
+
+        # Konfigurējiet režģus
+        table_window.grid_rowconfigure(0, weight=1)
+        table_window.grid_columnconfigure(0, weight=1)
+
+
 def generate_bar_chart():
     # Saņem izvēlēto ziņojuma veidu no nolaižamā saraksta
     report_type = report_type_var.get()
@@ -147,6 +199,25 @@ def generate_bar_chart():
 
         plt.tight_layout()
         plt.show()
+    elif report_type == 'Darbinieku skaits pēc adreses':
+        employee_counts = count_employees_by_address(df)
+
+        addresses = list(employee_counts.keys())
+        employee_counts_values = list(employee_counts.values())
+
+        # Ģenerē horizontālu joslu diagrammu ar adresēm un darbinieku skaitu
+        plt.figure(figsize=(8, 6))
+        bars = plt.barh(addresses, employee_counts_values, color='royalblue')
+        plt.xlabel('Darbinieku skaits')
+        plt.title('Darbinieku skaits pēc adreses')
+        
+        # Anotē joslas ar faktiskajiem darbinieku skaita vērtībām uz virsotnēm
+        for bar, count in zip(bars, employee_counts_values):
+            plt.text(count + 3.5, bar.get_y() + bar.get_height() / 2, f'{count}', ha='center', va='center', fontsize=10)
+        
+        plt.tight_layout()
+        plt.show()
+
 # Izveido galveno Tkinter logu
 root = tk.Tk()
 root.title('Ziņojumu ģenerators')
@@ -159,7 +230,7 @@ report_label.pack(pady=5)
 # Dropdown saraksts, lai izvēlētos ziņojuma veidu
 report_type_var = tk.StringVar()
 report_type_dropdown = ttk.Combobox(root, textvariable=report_type_var)
-report_type_dropdown['values'] = ('Nodaļu vidējās algas', 'Darbinieku skaits', 'Vidējais nodarbinātības laiks')  # Ziņojumu veidu saraksts
+report_type_dropdown['values'] = ('Nodaļu vidējās algas', 'Darbinieku skaits nodaļās', 'Darbinieku skaits pēc adreses')  # Ziņojumu veidu saraksts
 report_type_dropdown.pack(pady=5)
 
 # Poga ziņojuma ģenerēšanai kā tortes diagrammu
