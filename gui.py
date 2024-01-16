@@ -11,6 +11,7 @@ from funkcijas.count_employees import count_employees_per_division
 from funkcijas.count_by_address import count_employees_by_address
 from funkcijas.count_officials import count_officials
 from funkcijas.avg_evaluation_per_division import avg_evaluation_per_division
+from funkcijas.avg_time import calculate_average_employment_time_for_divisions
 
 # Ielādē datus no Excel faila
 df = pd.read_excel('empl.xlsx')
@@ -61,8 +62,17 @@ def generate_pie_chart():
 
         # Ģenerē tortes diagrammu ar reālām vērtībām
         plt.figure(figsize=(8, 8))
-        plt.pie(result.values(), labels=result.keys(), autopct='%1.2f', textprops={'fontsize': 10})
+        plt.pie(result.values(), labels=result.keys(), autopct=lambda p: f'{p*sum(result.values())/100:.2f}', textprops={'fontsize': 10})
         plt.title("Vidējais vērtējums nodaļās")
+        plt.show()
+    elif report_type == 'Vidējais darba stāžs nodaļās':
+        result = calculate_average_employment_time_for_divisions(division_list, df)
+
+        # Ģenerē tortes diagrammu ar reālām vērtībām
+        plt.figure(figsize=(8, 8))
+        plt.pie(result.values(), labels=result.keys(), autopct=lambda p: f'{p*sum(result.values())/100:.2f}', textprops={'fontsize': 10})
+
+        plt.title("Vidējais darba stāžs nodaļās")
         plt.show()
 
 # Funkcija tabulas ziņojuma ģenerēšanai
@@ -210,7 +220,6 @@ def generate_table_report():
         # Konfigurējiet režģus
         table_window.grid_rowconfigure(0, weight=1)
         table_window.grid_columnconfigure(0, weight=1)
-
     elif report_type == 'Vidējais vērtējums nodaļās':
 
         result = avg_evaluation_per_division(df, division_list)
@@ -243,6 +252,40 @@ def generate_table_report():
         style.configure("Treeview", rowheight=25, font=('Helvetica', 10))
         tree.tag_configure("centered", anchor="center")
 
+        # Konfigurējiet režģus
+        table_window.grid_rowconfigure(0, weight=1)
+        table_window.grid_columnconfigure(0, weight=1)
+    elif report_type == 'Vidējais darba stāžs nodaļās':
+        result = calculate_average_employment_time_for_divisions(division_list, df)
+    
+        # Izveido jaunu logu tabulas rādīšanai
+        table_window = tk.Toplevel(root)
+        table_window.title('Tabulas ziņojums')
+    
+        # Izveido Treeview logrīka izveidošanai
+        tree = ttk.Treeview(table_window, columns=("Nodaļa", "Vidējais darba stāžs"), show="headings")
+        tree.heading("Nodaļa", text="Nodaļa", anchor="center")
+        tree.heading("Vidējais darba stāžs", text="Vidējais darba stāžs", anchor="center")
+        tree.column("Nodaļa", width=300)
+        tree.column("Vidējais darba stāžs", width=150)
+    
+        # Izveido vertikālu ritjoslu
+        tree_scrollbar = ttk.Scrollbar(table_window, orient="vertical", command=tree.yview)
+        tree.configure(yscroll=tree_scrollbar.set)
+    
+        # Iepakojiet Treeview un ritjoslu
+        tree.grid(row=0, column=0, sticky="nsew")
+        tree_scrollbar.grid(row=0, column=1, sticky="ns")
+    
+        # Ievietojiet datus Treeview logrīkā ar centrētu izlīdzinājumu
+        for division, avg_employment_time in result.items():
+            tree.insert("", "end", values=(division, f"{avg_employment_time:.2f}"))
+    
+        # Pievieno režģus Treeview
+        style = ttk.Style()
+        style.configure("Treeview", rowheight=25, font=('Helvetica', 10))
+        tree.tag_configure("centered", anchor="center")
+    
         # Konfigurējiet režģus
         table_window.grid_rowconfigure(0, weight=1)
         table_window.grid_columnconfigure(0, weight=1)
@@ -349,6 +392,25 @@ def generate_bar_chart():
 
         plt.tight_layout()
         plt.show()
+    elif report_type == 'Vidējais darba stāžs nodaļās':
+        # Calculate the average employment time for divisions
+        result = calculate_average_employment_time_for_divisions(division_list, df)
+
+        divisions = list(result.keys())
+        avg_employment_values = list(result.values())
+
+        # Create a horizontal bar chart with divisions and average employment time
+        plt.figure(figsize=(8, 6))
+        bars = plt.barh(divisions, avg_employment_values, color='royalblue')
+        plt.xlabel('Vidējais darba stāžs')
+        plt.title('Vidējais darba stāžs nodaļās')
+
+        # Annotate the bars with actual average employment times on top
+        for bar, avg_time in zip(bars, avg_employment_values):
+            plt.text(avg_time - 2.1, bar.get_y() + bar.get_height() / 2, f'{avg_time:.2f} gadi', ha='center', va='center', fontsize=10)
+
+        plt.tight_layout()
+        plt.show()
 
 # Izveido galveno Tkinter logu
 root = tk.Tk()
@@ -362,7 +424,7 @@ report_label.pack(pady=5)
 # Dropdown saraksts, lai izvēlētos ziņojuma veidu
 report_type_var = tk.StringVar()
 report_type_dropdown = ttk.Combobox(root, textvariable=report_type_var)
-report_type_dropdown['values'] = ('Nodaļu vidējās algas', 'Darbinieku skaits nodaļās', 'Darbinieku skaits pēc adreses', 'Darbinieku statuss', 'Vidējais vērtējums nodaļās')  # Ziņojumu veidu saraksts
+report_type_dropdown['values'] = ('Nodaļu vidējās algas', 'Darbinieku skaits nodaļās', 'Darbinieku skaits pēc adreses', 'Darbinieku statuss', 'Vidējais vērtējums nodaļās', 'Vidējais darba stāžs nodaļās')  # Ziņojumu veidu saraksts
 report_type_dropdown.pack(pady=5)
 
 # Poga ziņojuma ģenerēšanai kā tortes diagrammu
