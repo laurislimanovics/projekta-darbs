@@ -66,10 +66,10 @@ for division, average_salary in division_salary_averages.items():
 print("---------------------------------------------")
 for division, employee_count in division_employee_counts.items():
     print(f"{division} - darbinieku skaits: {employee_count}")
-print("---------------------------------------------")
-print(f"{officials_counts['amatpersonas']} darbinieki ir amatpersonas.")
-print(f"{officials_counts['nav amatpersonas']} darbinieki nav amatpersonas.")
-print("---------------------------------------------")
+# print("---------------------------------------------")
+# print(f"{officials_counts['amatpersonas']} darbinieki ir amatpersonas.")
+# print(f"{officials_counts['nav amatpersonas']} darbinieki nav amatpersonas.")
+# print("---------------------------------------------")
 for address, count in address_counts.items():
     print(f"Adresē '{address}' strādā {count} darbinieki.")
 print("---------------------------------------------")

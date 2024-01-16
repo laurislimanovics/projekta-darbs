@@ -10,6 +10,7 @@ from funkcijas.avg_salary import average_salary
 from funkcijas.count_employees import count_employees_per_division
 from funkcijas.count_by_address import count_employees_by_address
 from funkcijas.count_officials import count_officials
+from funkcijas.avg_evaluation_per_division import avg_evaluation_per_division
 
 # Ielādē datus no Excel faila
 df = pd.read_excel('empl.xlsx')
@@ -55,6 +56,15 @@ def generate_pie_chart():
         plt.pie(result.values(), labels=result.keys(), autopct=lambda p: f'{int(p * sum(result.values()) / 100)}', textprops={'fontsize': 10})
         plt.title("Darbinieka statuss")
         plt.show()
+    elif report_type == 'Vidējais vērtējums nodaļās':
+        result = avg_evaluation_per_division(df, division_list)
+
+        # Ģenerē tortes diagrammu ar reālām vērtībām
+        plt.figure(figsize=(8, 8))
+        plt.pie(result.values(), labels=result.keys(), autopct='%1.2f', textprops={'fontsize': 10})
+        plt.title("Vidējais vērtējums nodaļās")
+        plt.show()
+
 # Funkcija tabulas ziņojuma ģenerēšanai
 def generate_table_report():
     # Saņem izvēlēto ziņojuma veidu no nolaižamā saraksta
@@ -92,8 +102,7 @@ def generate_table_report():
 
         # Konfigurējiet režģus
         table_window.grid_rowconfigure(0, weight=1)
-        table_window.grid_columnconfigure(0, weight=1)
-        
+        table_window.grid_columnconfigure(0, weight=1) 
     elif report_type == 'Darbinieku skaits nodaļās': 
         employee_counts = count_employees_per_division(division_list, df)
 
@@ -128,7 +137,6 @@ def generate_table_report():
         # Konfigurējiet režģus
         table_window.grid_rowconfigure(0, weight=1)
         table_window.grid_columnconfigure(0, weight=1)
-
     elif report_type == 'Darbinieku skaits pēc adreses':
         employee_counts = count_employees_by_address(df)
 
@@ -167,9 +175,6 @@ def generate_table_report():
         table_window.grid_rowconfigure(0, weight=1)
         table_window.grid_columnconfigure(0, weight=1)
     elif report_type == 'Darbinieku statuss':
-        from funkcijas.count_officials import count_officials
-
-        employee_counts = count_officials(df)
 
         addresses = list(employee_counts.keys())
         employee_counts_values = list(employee_counts.values())
@@ -205,6 +210,43 @@ def generate_table_report():
         # Konfigurējiet režģus
         table_window.grid_rowconfigure(0, weight=1)
         table_window.grid_columnconfigure(0, weight=1)
+
+    elif report_type == 'Vidējais vērtējums nodaļās':
+
+        result = avg_evaluation_per_division(df, division_list)
+
+        # Izveido jaunu logu tabulas rādīšanai
+        table_window = tk.Toplevel(root)
+        table_window.title('Tabulas ziņojums')
+
+        # Izveido Treeview logrīka izveidošanai
+        tree = ttk.Treeview(table_window, columns=("Nodaļa", "Vidējais vērtējums"), show="headings")
+        tree.heading("Nodaļa", text="Nodaļa", anchor="center")
+        tree.heading("Vidējais vērtējums", text="Vidējais vērtējums", anchor="center")
+        tree.column("Nodaļa", width=300)
+        tree.column("Vidējais vērtējums", width=150)
+
+        # Izveido vertikālu ritjoslu
+        tree_scrollbar = ttk.Scrollbar(table_window, orient="vertical", command=tree.yview)
+        tree.configure(yscroll=tree_scrollbar.set)
+
+        # Iepakojiet Treeview un ritjoslu
+        tree.grid(row=0, column=0, sticky="nsew")
+        tree_scrollbar.grid(row=0, column=1, sticky="ns")
+
+        # Ievietojiet datus Treeview logrīkā ar centrētu izlīdzinājumu
+        for division, avg_evaluation in result.items():
+            tree.insert("", "end", values=(division, f"{avg_evaluation}"))
+
+        # Pievieno režģus Treeview
+        style = ttk.Style()
+        style.configure("Treeview", rowheight=25, font=('Helvetica', 10))
+        tree.tag_configure("centered", anchor="center")
+
+        # Konfigurējiet režģus
+        table_window.grid_rowconfigure(0, weight=1)
+        table_window.grid_columnconfigure(0, weight=1)
+
 
 def generate_bar_chart():
     # Saņem izvēlēto ziņojuma veidu no nolaižamā saraksta
@@ -264,7 +306,6 @@ def generate_bar_chart():
         plt.tight_layout()
         plt.show()
     elif report_type == 'Darbinieku statuss':
-        from funkcijas.count_officials import count_officials
 
         employee_counts = count_officials(df)
 
@@ -283,6 +324,32 @@ def generate_bar_chart():
 
         plt.tight_layout()
         plt.show()
+    elif report_type == 'Vidējais vērtējums nodaļās':
+        # Izveido kopiju no datu kopas
+        df_copy = df.copy()
+
+        # Pārveidojiet burtu novērtējumus uz skaitliskām vērtībām
+        grade_to_numeric = {'A': 5, 'B': 4, 'C': 3, 'D': 2, 'F': 1}
+        df_copy['NumericVērtējums'] = df_copy['Vērtējums'].map(grade_to_numeric)
+
+        employee_counts = avg_evaluation_per_division(df_copy, division_list)
+
+        # Pārvērst vārdnīcas atslēgas sarakstu
+        divisions = list(employee_counts.keys())
+
+        # Ģenerē horizontālu joslu diagrammu ar nodaļām un darbinieku skaitu
+        plt.figure(figsize=(8, 6))
+        bars = plt.barh(divisions, employee_counts.values(), color='royalblue')
+        plt.xlabel('Vidējais vērtējums')
+        plt.title('Vidējais vērtējums nodaļās')
+
+        # Anotē joslas ar faktiskajiem darbinieku skaita vērtībām uz virsotnēm
+        for bar, count in zip(bars, employee_counts.values()):
+            plt.text(count - 0.15, bar.get_y() + bar.get_height() / 2, f'{count:.2f}', ha='center', va='center', fontsize=10)
+
+        plt.tight_layout()
+        plt.show()
+
 # Izveido galveno Tkinter logu
 root = tk.Tk()
 root.title('Ziņojumu ģenerators')
@@ -295,7 +362,7 @@ report_label.pack(pady=5)
 # Dropdown saraksts, lai izvēlētos ziņojuma veidu
 report_type_var = tk.StringVar()
 report_type_dropdown = ttk.Combobox(root, textvariable=report_type_var)
-report_type_dropdown['values'] = ('Nodaļu vidējās algas', 'Darbinieku skaits nodaļās', 'Darbinieku skaits pēc adreses', 'Darbinieku statuss')  # Ziņojumu veidu saraksts
+report_type_dropdown['values'] = ('Nodaļu vidējās algas', 'Darbinieku skaits nodaļās', 'Darbinieku skaits pēc adreses', 'Darbinieku statuss', 'Vidējais vērtējums nodaļās')  # Ziņojumu veidu saraksts
 report_type_dropdown.pack(pady=5)
 
 # Poga ziņojuma ģenerēšanai kā tortes diagrammu

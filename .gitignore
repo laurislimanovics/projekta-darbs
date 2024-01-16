@@ -2,3 +2,4 @@
 *.pyc
 *.pyc
 funkcijas/__pycache__/check_replace.cpython-311.pyc
+*.pyc
