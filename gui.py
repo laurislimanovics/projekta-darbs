@@ -13,6 +13,7 @@ from funkcijas.count_officials import count_officials
 from funkcijas.avg_evaluation_per_division import avg_evaluation_per_division
 from funkcijas.avg_time import calculate_average_employment_time_for_divisions
 from funkcijas.empl_workload import count_employees_by_workload
+from funkcijas.empl_eval import count_employee_evaluation
 
 # Ielādē datus no Excel faila
 df = pd.read_excel('empl.xlsx')
@@ -89,6 +90,14 @@ def generate_pie_chart():
 
         plt.pie(values_list, labels=employee_counts_by_workload.keys(), autopct=lambda pct: my_autopct(pct, values_list), textprops={'fontsize': 10})
         plt.title("Darbinieku skaits pēc slodzes")
+        plt.show()
+    elif report_type == 'Darbinieku skaits pēc vērtējuma':
+        result = count_employee_evaluation(df)
+
+        # Ģenerē tortes diagrammu ar reālām vērtībām
+        plt.figure(figsize=(8, 8))
+        plt.pie(result.values, labels=result.keys(), autopct=lambda p: f'{p*sum(result.values)/100:.2f}', textprops={'fontsize': 10})
+        plt.title("Darbinieku skaits pēc vērtējuma")
         plt.show()
 
 # Funkcija tabulas ziņojuma ģenerēšanai
@@ -339,6 +348,40 @@ def generate_table_report():
         # Konfigurējiet režģus
         table_window.grid_rowconfigure(0, weight=1)
         table_window.grid_columnconfigure(0, weight=1)
+    elif report_type == 'Darbinieku skaits pēc vērtējuma':
+        result = count_employee_evaluation(df)
+
+        # Izveido jaunu logu tabulas rādīšanai
+        table_window = tk.Toplevel(root)
+        table_window.title('Tabulas ziņojums')
+
+        # Izveido Treeview logrīka izveidošanai
+        tree = ttk.Treeview(table_window, columns=("Vērtējums", "Darbinieku skaits"), show="headings")
+        tree.heading("Vērtējums", text="Vērtējums", anchor="center")
+        tree.heading("Darbinieku skaits", text="Darbinieku skaits", anchor="center")
+        tree.column("Vērtējums", width=300)
+        tree.column("Darbinieku skaits", width=150)
+
+        # Izveido vertikālu ritjoslu
+        tree_scrollbar = ttk.Scrollbar(table_window, orient="vertical", command=tree.yview)
+        tree.configure(yscroll=tree_scrollbar.set)
+
+        # Iepakojiet Treeview un ritjoslu
+        tree.grid(row=0, column=0, sticky="nsew")
+        tree_scrollbar.grid(row=0, column=1, sticky="ns")
+
+        # Ievietojiet datus Treeview logrīkā ar centrētu izlīdzinājumu
+        for evaluation, employee_count in result.items():
+            tree.insert("", "end", values=(evaluation, employee_count), tags=("centered",))
+
+        # Pievieno režģus Treeview
+        style = ttk.Style()
+        style.configure("Treeview", rowheight=25, font=('Helvetica', 10))
+        tree.tag_configure("centered", anchor="center")
+
+        # Konfigurē režģus
+        table_window.grid_rowconfigure(0, weight=1)
+        table_window.grid_columnconfigure(0, weight=1)
 
 
 
@@ -444,19 +487,19 @@ def generate_bar_chart():
         plt.tight_layout()
         plt.show()
     elif report_type == 'Vidējais darba stāžs nodaļās':
-        # Calculate the average employment time for divisions
+        # Aprēķina vidējo darba stāžu nodaļās
         result = calculate_average_employment_time_for_divisions(division_list, df)
 
         divisions = list(result.keys())
         avg_employment_values = list(result.values())
 
-        # Create a horizontal bar chart with divisions and average employment time
+        # Ģenerē horizontālu joslu diagrammu ar adresēm un darbinieku skaitu
         plt.figure(figsize=(8, 6))
         bars = plt.barh(divisions, avg_employment_values, color='royalblue')
         plt.xlabel('Vidējais darba stāžs')
         plt.title('Vidējais darba stāžs nodaļās')
 
-        # Annotate the bars with actual average employment times on top
+        # Anotē joslas ar faktiskajiem darbinieku skaita vērtībām uz virsotnēm
         for bar, avg_time in zip(bars, avg_employment_values):
             plt.text(avg_time - 2.1, bar.get_y() + bar.get_height() / 2, f'{avg_time:.2f} gadi', ha='center', va='center', fontsize=10)
 
@@ -465,8 +508,8 @@ def generate_bar_chart():
     elif report_type == 'Darbinieku skaits pēc slodzes':
         employee_counts = count_employees_by_workload(df)
 
-        addresses = employee_counts.index.tolist()  # Convert the index to a list
-        employee_counts_values = employee_counts.values  # No need to convert to a list, it's already an array
+        addresses = employee_counts.index.tolist() 
+        employee_counts_values = employee_counts.values  
     
         # Ģenerē horizontālu joslu diagrammu ar adresēm un darbinieku skaitu
         plt.figure(figsize=(10, 8))
@@ -476,6 +519,24 @@ def generate_bar_chart():
 
         # Anotē joslas ar faktiskajiem darbinieku skaita vērtībām uz virsotnēm
         for bar, count in zip(bars, employee_counts_values):
+            plt.text(count + 3.5, bar.get_y() + bar.get_height() / 2, f'{count}', ha='center', va='center', fontsize=10)
+
+        plt.tight_layout()
+        plt.show()
+    elif report_type == 'Darbinieku skaits pēc vērtējuma':
+        evaluation_counts = count_employee_evaluation(df)
+
+        evaluations = evaluation_counts.index.tolist()
+        evaluation_counts_values = evaluation_counts.values
+
+        # Ģenerē horizontālu joslu diagrammu ar adresēm un darbinieku skaitu
+        plt.figure(figsize=(10, 8))
+        bars = plt.barh(evaluations, evaluation_counts_values, color='skyblue')
+        plt.xlabel('Darbinieku skaits')
+        plt.title('Darbinieku skaits pēc vērtējuma')
+
+        # Anotē joslas ar faktiskajiem darbinieku skaita vērtībām uz virsotnēm
+        for bar, count in zip(bars, evaluation_counts_values):
             plt.text(count + 3.5, bar.get_y() + bar.get_height() / 2, f'{count}', ha='center', va='center', fontsize=10)
 
         plt.tight_layout()
@@ -493,7 +554,7 @@ report_label.pack(pady=5)
 # Dropdown saraksts, lai izvēlētos ziņojuma veidu
 report_type_var = tk.StringVar()
 report_type_dropdown = ttk.Combobox(root, textvariable=report_type_var)
-report_type_dropdown['values'] = ('Nodaļu vidējās algas', 'Darbinieku skaits nodaļās', 'Darbinieku skaits pēc adreses', 'Darbinieku statuss', 'Vidējais vērtējums nodaļās', 'Vidējais darba stāžs nodaļās', 'Darbinieku skaits pēc slodzes')  # Ziņojumu veidu saraksts
+report_type_dropdown['values'] = ('Nodaļu vidējās algas', 'Darbinieku skaits nodaļās', 'Darbinieku skaits pēc adreses', 'Darbinieku statuss', 'Vidējais vērtējums nodaļās', 'Vidējais darba stāžs nodaļās', 'Darbinieku skaits pēc slodzes', 'Darbinieku skaits pēc vērtējuma')  # Ziņojumu veidu saraksts
 report_type_dropdown.pack(pady=5)
 
 # Poga ziņojuma ģenerēšanai kā tortes diagrammu
