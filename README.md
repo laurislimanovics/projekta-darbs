@@ -40,3 +40,10 @@ Programmatūra ir aprīkota ar interaktīvu un intuitīvu grafisko lietotāja sa
 
 ### Dati un To Analīze
 Lietotāji var ielādēt datus no Excel failiem, kuri tiek apstrādāti izmantojot `pandas` bibliotēku. Analīzes rezultāti tiek parādīti caur `matplotlib` grafikiem un diagrammām, sniedzot vizuāli pievilcīgu un informatīvu datu atspoguļojumu.
+### Paplašināšanas un Uzturēšanas Iespējas
+Projekta modulāra struktūra ļauj viegli pievienot jaunas funkcijas vai modificēt esošās, neietekmējot programmas kopējo darbību. Tas padara programmu elastīgu un viegli uzturamu.
+
+## Nobeigumā
+Projekts "Darbinieku Datu Analīze un Vizualizācija" ir izstrādāts, lai atvieglotu un padarītu efektīvāku organizācijas darbinieku datu analīzi. Tā intuitīvā lietotāja saskarne un spēcīgās analīzes iespējas padara to par vērtīgu rīku jebkuram, kas vēlas gūt dziļāku izpratni par organizācijas darbinieku statistiku.
+
+# Programmas darbības demonstrācija
