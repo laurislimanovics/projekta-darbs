@@ -16,6 +16,8 @@ Projekts "Darbinieku Datu Analīze un Vizualizācija" ir izveidots, lai sniegtu 
 ## Uzsākšana
 
 Lai sāktu darbu ar programmu, jums ir nepieciešams Python vismaz 3.8 versija, kā arī šādas bibliotēkas: `tkinter`, `pandas`, `matplotlib`.
+> [!WARNING]  
+> Šī programma strādā tikai, ja to palaiž lokāli uz datora. GitHub Codespace neatbalsta GUI elementus!
 
 ### Instalācija
 
