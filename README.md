@@ -20,3 +20,23 @@ Lai sāktu darbu ar programmu, jums ir nepieciešams Python vismaz 3.8 versija, 
 ### Instalācija
 
 Pirms programmas palaišanas, jums jāinstalē nepieciešamās atkarības izmantojot pip:
+```bash
+pip install pandas matplotlib tkinter
+```
+
+## Izmantotās Python Bibliotēkas un To Nozīme
+
+- **Tkinter**: Izmantots, lai izveidotu grafisko lietotāja saskarni (GUI). Tas ļauj lietotājiem ērti piekļūt datu analīzes funkcijām caur vizuālu interfeisu.
+
+- **Pandas**: Galvenā bibliotēka datu apstrādei. Izmantota, lai ielādētu, apstrādātu un analizētu datus no Excel failiem.
+
+- **Matplotlib**: Izmantots datu vizualizācijai. Ļauj attēlot datus grafikos un diagrammās, padarot analīzi vizuāli saprotamu.
+
+- **Funkciju moduļi**: Projekta modulāra struktūra ar funkcijām no funkcijas direktorijas, piemēram, avg_salary, count_employees_per_division, u.c., nodrošina koda skaidrību un atkārtoti izmantojamību, vienkāršojot specifisku analīzes uzdevumu veikšanu.
+
+## Programmatūras Izmantošanas Metodes
+### Lietotāja Saskarne
+Programmatūra ir aprīkota ar interaktīvu un intuitīvu grafisko lietotāja saskarni, kas ļauj lietotājiem viegli izvēlēties un izmantot dažādas datu analīzes opcijas. Saskarne ir izstrādāta, lai būtu vienkārši saprotama un lietojama, nodrošinot lietotājiem gludu darba plūsmu.
+
+### Dati un To Analīze
+Lietotāji var ielādēt datus no Excel failiem, kuri tiek apstrādāti izmantojot `pandas` bibliotēku. Analīzes rezultāti tiek parādīti caur `matplotlib` grafikiem un diagrammām, sniedzot vizuāli pievilcīgu un informatīvu datu atspoguļojumu.
