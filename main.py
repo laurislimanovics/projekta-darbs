@@ -219,6 +219,7 @@ def generate_table_report():
         table_window.grid_rowconfigure(0, weight=1)
         table_window.grid_columnconfigure(0, weight=1)
     elif report_type == 'Darbinieku statuss':
+        employee_counts = count_officials(df)
 
         addresses = list(employee_counts.keys())
         employee_counts_values = list(employee_counts.values())

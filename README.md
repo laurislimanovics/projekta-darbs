@@ -49,3 +49,4 @@ Projekta modulāra struktūra ļauj viegli pievienot jaunas funkcijas vai modifi
 Projekts "Darbinieku Datu Analīze un Vizualizācija" ir izstrādāts, lai atvieglotu un padarītu efektīvāku organizācijas darbinieku datu analīzi. Tā intuitīvā lietotāja saskarne un spēcīgās analīzes iespējas padara to par vērtīgu rīku jebkuram, kas vēlas gūt dziļāku izpratni par organizācijas darbinieku statistiku.
 
 # Programmas darbības demonstrācija
+https://github.com/laurislimanovics/projekta-darbs/assets/144335516/5fbf873c-938f-4846-bcb1-f1df3497d993
